@@ -23,8 +23,7 @@ app _ respond = do
         DCP.streamingProcess (shell "ffmpeg -i /home/tombert/Downloads/sintel.mp4 -f matroska -")
                  -- .| mapC BS.concat
 
-    let fart = src .| mapC BSB.fromByteString .| mapC Chunk
-    respond $ responseSource status200 [] fart 
+    respond $ responseSource status200 [] (src .| mapC BSB.fromByteString .| mapC Chunk) 
 
 someFunc :: IO ()
 someFunc = do
