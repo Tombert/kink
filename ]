@@ -1,0 +1,12 @@
+module Lib
+    ( someFunc
+    ) where
+import Conduit
+import Data.Conduit.Combinators as CC
+
+
+
+someFunc :: IO ()
+someFunc = Prelude.print $ runConduitPure $ CC.yieldMany (Just 2) .| CC.foldl (+) 4
+
+
