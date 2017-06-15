@@ -28,6 +28,8 @@ library
                      , binary 
                      , http-types
                      , wai-conduit
+                     , text
+                     , unordered-containers
   default-language:    Haskell2010
 
 executable kink-exe
