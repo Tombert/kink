@@ -19,17 +19,19 @@ import GHC.Word
 callback :: Builder -> Flush Builder 
 callback x = Chunk x
 -- -> HashMap BS.ByteString BS.ByteString 
-transcode ::  (Response -> IO ResponseReceived) -> HashMap BS.ByteString BS.ByteString -> IO ResponseReceived
-transcode respond queryParams = do
+transcode ::  (Response -> IO ResponseReceived) -> T.Text -> HashMap BS.ByteString BS.ByteString -> IO ResponseReceived
+transcode respond path queryParams = do
     -- let startTime' = HML.lookup "start" queryParams 
     --     startTime = fromMaybe startTime'
     Prelude.putStrLn "I've done some IO here"
-    (Inherited, src, Inherited, cph) <-
-        DCP.streamingProcess (shell "ffmpeg -i /home/tombert/Downloads/sintel.mp4 -vcodec libx264 -x264-params keyint=60:no-scenecut  -f matroska -")
-        --DCP.streamingProcess (shell "cat /home/tombert/Downloads/sintel.mp4")
+    --(Inherited, src, Inherited, cph) <-
+        --DCP.streamingProcess (shell "ffmpeg -i /home/tombert/Downloads/sintel.mp4  -f matroska /home/tombert/fart/fart.3u8")
+     --   DCP.streamingProcess (shell ("cat /home/tombert/Downloads/" ++ (T.unpack path )))
                  -- .| mapC BS.concat
 
-    respond $ responseSource status200 [("Content-Type", "video/webm") ,("X-Content-Duration", "90.0")] (src .| mapC BSB.fromByteString .| mapC Chunk) 
+    --respond $ responseSource status200 [("X-Content-Duration", "90.0")] (src .| mapC BSB.fromByteString .| mapC Chunk) 
+    
+    respond $ responseFile status200 [("Content-Type", "video/mp4"), ("Content-Duration", "90.0")] ("/home/tombert/Downloads/" ++ (T.unpack path )) Nothing
 
 
 filterOptions =
@@ -43,8 +45,8 @@ extractQueryParams = (fromList . filterOptions . queryString )
 appRouter :: Application
 appRouter request respond = 
       let fart = queryParams in 
-      case rawPathInfo request of
-          "/transcode" -> transcode respond fart
+      case pathparts of
+          ["transcode", x] -> transcode respond x fart
 
     where
         pathparts = pathInfo request
